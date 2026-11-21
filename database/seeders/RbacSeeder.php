@@ -30,6 +30,7 @@ class RbacSeeder extends Seeder
                     'name' => RbacCatalog::roleName($key),
                     'scope' => RbacCatalog::roleScope($key),
                     'panel' => $panelMap[$key] ?? null,
+                    'action_scope' => RbacCatalog::roleActionScope($key),
                     'is_machine' => RbacCatalog::isMachineRole($key),
                     'description' => null,
                 ],

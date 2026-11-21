@@ -89,6 +89,17 @@
         @endforeach
     @endif
 
+    {{-- Menu Dinamis — clinic-panel groups/entries the Principal composed in
+         the navigation builder. Visibility is re-derived per acting user by
+         `treeFor()`, so an entry gated by a permission or role they lack never
+         renders for them. --}}
+    @foreach (App\Models\Menu::treeFor(auth()->user(), App\Models\Menu::PANEL_CLINIC) as $dynamicGroup)
+        <p class="principal-sidebar__group mt-4 px-3 text-xs font-semibold tracking-wide uppercase">{{ $dynamicGroup['group_label'] }}</p>
+        @foreach ($dynamicGroup['items'] as $dynamicItem)
+            @include('principal.layouts._menu-item', ['item' => $dynamicItem])
+        @endforeach
+    @endforeach
+
     <a class="principal-link" href="{{ route('filament.clinic.pages.dashboard') }}" title="{{ __('principal.clinic.legacy') }}">
         <x-filament::icon :icon="Heroicon::OutlinedChartBar" class="principal-link__icon size-5" />
         <span class="principal-link__label">{{ __('principal.clinic.legacy') }}</span>

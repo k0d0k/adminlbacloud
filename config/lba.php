@@ -611,4 +611,22 @@ return [
         'mysqldump_binary' => env('LBA_DEPLOY_MYSQLDUMP_BINARY', 'mysqldump'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Synthetic demo data (local / staging only)
+    |--------------------------------------------------------------------------
+    |
+    | OFF by default so `migrate --seed` never introduces an identity with a
+    | predictable credential. When enabled AND the environment is local or
+    | staging, DatabaseSeeder also runs DemoDataSeeder, which creates one fully
+    | provisioned demo partner with a sample user for EVERY role (principal,
+    | tenant and patient) plus the related brands, subscription, branches and
+    | patients. The demo tenant gets its OWN isolated database, exactly like a
+    | real partner. It is never run in production OR testing.
+    |
+    */
+    'demo' => [
+        'seed' => env('LBA_SEED_DEMO', false),
+    ],
+
 ];

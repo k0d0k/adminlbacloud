@@ -1491,6 +1491,15 @@ return [
         'database_unavailable' => 'This partner\'s database is not ready yet. Contact your platform administrator to finish provisioning.',
     ],
 
+    // ----------------------------------------------- Inactive partner subscription
+    'subscription' => [
+        'inactive_badge' => 'Subscription Inactive',
+        'inactive_title' => 'Your subscription is inactive',
+        'inactive_tenant' => 'Partner: :tenant',
+        'inactive_body' => 'Your subscription period has ended or its status is not active, so you cannot use the application or its modules yet.',
+        'inactive_help' => 'Please contact the Principal to renew or reactivate your subscription.',
+    ],
+
     // ------------------------------------------------------------ Widget chrome
     'widget' => [
         'platform_heading' => 'Key Platform Indicators',
@@ -2018,6 +2027,7 @@ return [
         'assign_owner' => 'Assign owner',
         'edit_roles' => 'Edit roles',
         'roles_updated' => 'Membership roles updated.',
+        'roles_escalation_denied' => 'You cannot grant a role with a higher action level (CRUD) than your own access.',
         'member_suspend' => 'Suspend',
         'member_activate' => 'Activate',
         'member_revoke' => 'Revoke',
@@ -2490,6 +2500,7 @@ return [
         'no_members' => 'No members linked to this tenant.',
         'save_roles' => 'Save roles',
         'roles_updated' => 'Member roles updated.',
+        'roles_escalation_denied' => 'You cannot grant a role with a higher action level (CRUD) than your own access.',
         'matrix' => 'Role → Permission Matrix',
         'col_role' => 'Role',
         'col_permissions' => 'Permissions',
@@ -2541,6 +2552,7 @@ return [
         'grant_denied' => 'The role could not be granted.',
         'revoked' => 'Platform role revoked.',
         'revoke_denied' => 'The role could not be revoked.',
+        'roles_updated' => 'Platform roles for :name updated.',
     ],
 
     'roles' => [
@@ -2561,6 +2573,15 @@ return [
         'tenant_finance' => 'Tenant Finance',
         'patient_customer' => 'Patient / Customer',
         'ai_service' => 'AI Service (machine)',
+    ],
+
+    // -------------------------------- Requirement 3.a — CRUD vs CRU action level
+    'action_scope' => [
+        'column' => 'Action level',
+        'cru' => 'CRU',
+        'crud' => 'CRUD',
+        'cru_hint' => 'View, create, update — no delete.',
+        'crud_hint' => 'View, create, update and delete.',
     ],
 
     // -------------------------------------- WS6.E — five user categories

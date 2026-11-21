@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Brand;
+use App\Models\Menu;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Platform\Access\RoleKey;
@@ -331,7 +332,10 @@ class PrincipalTailAdminTest extends TestCase
             $this->actingAs($actor)->get($path)->assertForbidden();
             $this->post("{$path}/preview", BrandCrudDefinition::defaults())->assertForbidden();
             $this->post("{$path}/export", BrandCrudDefinition::defaults())->assertForbidden();
+            $this->post("{$path}/generate", BrandCrudDefinition::defaults())->assertForbidden();
         }
+
+        $this->assertDatabaseCount('menus', 0);
     }
 
     public function test_generator_exports_only_validated_options_and_previews_the_source(): void
@@ -355,6 +359,46 @@ class PrincipalTailAdminTest extends TestCase
             ->assertUnprocessable()->assertJsonValidationErrors('definition.columns.0');
         $this->postJson("{$path}/export", array_replace($definition, ['actions' => ['delete']]))
             ->assertUnprocessable()->assertJsonValidationErrors('definition.actions.0');
+    }
+
+    public function test_generator_creates_a_module_menu_visible_to_the_selected_roles(): void
+    {
+        $actor = $this->principal();
+        $outsider = $this->principal(RoleKey::BRAND_MANAGER);
+
+        $payload = array_replace(BrandCrudDefinition::defaults(), [
+            'panel' => Menu::PANEL_PRINCIPAL,
+            'group_key' => 'lba.generated',
+            'group_label' => 'Generated Modules',
+            'label' => 'Generated Brand Module',
+            'icon' => 'heroicon-o-cog',
+            'route_name' => 'principal.tailadmin.brands.index',
+            'role_keys' => [RoleKey::PRINCIPAL_SUPER_ADMIN],
+        ]);
+
+        $this->actingAs($actor)
+            ->post('/principal/crud-generator/generate', $payload)
+            ->assertRedirect(route('principal.tailadmin.crud.index'))
+            ->assertSessionHas('success', __('principal.crud.generated_module', ['name' => 'Generated Brand Module']));
+
+        $menu = Menu::query()
+            ->where('source', Menu::SOURCE_GENERATED)
+            ->where('label', 'Generated Brand Module')
+            ->sole();
+
+        $this->assertSame(Menu::PANEL_PRINCIPAL, $menu->panel);
+        $this->assertSame('lba.generated', $menu->group_key);
+        $this->assertSame('Generated Modules', $menu->group_label);
+        $this->assertSame('principal.tailadmin.brands.index', $menu->route_name);
+        $this->assertSame([RoleKey::PRINCIPAL_SUPER_ADMIN], $menu->role_keys);
+        $this->assertTrue($menu->is_active);
+        $this->assertTrue($menu->visibleTo($actor));
+        $this->assertFalse($menu->visibleTo($outsider));
+
+        // The new module shows immediately in the sidebar for the bound role.
+        $this->actingAs($actor)->get('/principal/crud-generator')
+            ->assertOk()
+            ->assertSee('Generated Brand Module');
     }
 
     public function test_artisan_generation_is_deterministic_and_preserves_existing_files(): void

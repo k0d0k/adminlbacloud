@@ -10,9 +10,12 @@ use App\Platform\Access\Exceptions\PasswordSetException;
 use App\Platform\Access\PasswordReset;
 use App\Platform\Access\PasswordSetter;
 use App\Platform\Access\PermissionKey;
+use App\Platform\Access\PrincipalAccessAdministration;
+use App\Platform\Access\RbacCatalog;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
 /**
@@ -46,7 +49,7 @@ final class UserController extends Controller
         $search = trim((string) ($filters['search'] ?? ''));
 
         $users = User::query()
-            ->with(['tenantMemberships.tenant', 'tenantMemberships.roles'])
+            ->with(['tenantMemberships.tenant', 'tenantMemberships.roles', 'principalRoleAssignments.role'])
             ->when($search !== '', static function ($query) use ($search): void {
                 $query->where(function ($inner) use ($search): void {
                     $inner->where('name', 'like', '%'.$search.'%')
@@ -60,7 +63,44 @@ final class UserController extends Controller
         return view('principal.users.index', [
             'users' => $users,
             'search' => $search,
+            'principalRoles' => RbacCatalog::principalAssignableRoles(),
+            'roleActionScopes' => RbacCatalog::roleActionScopes(),
         ]);
+    }
+
+    /**
+     * Requirement 3.b — add or remove a user's platform (Principal) roles.
+     *
+     * The submitted checkbox set is the DESIRED state: a checked role is granted
+     * and an unchecked one revoked. Every change re-derives authorization
+     * server-side and passes through {@see PrincipalAccessAdministration}, so a
+     * CRU principal can never escalate an identity to a CRUD role.
+     */
+    public function updateRoles(Request $request, User $user, PrincipalAccessAdministration $admin): RedirectResponse
+    {
+        abort_unless(self::principalCan(PermissionKey::PLATFORM_RBAC_MANAGE), 403);
+
+        $data = $request->validate([
+            'role_keys' => ['nullable', 'array'],
+            'role_keys.*' => ['string', Rule::in(RbacCatalog::principalAssignableRoles())],
+        ]);
+
+        $selected = array_values(array_filter((array) ($data['role_keys'] ?? []), 'is_string'));
+        $actor = $request->user();
+
+        foreach (RbacCatalog::principalAssignableRoles() as $roleKey) {
+            if (in_array($roleKey, $selected, true)) {
+                if (! $admin->assignRole($user, $roleKey, $actor)) {
+                    return back()->withErrors(['role_keys' => __('lba.settings.grant_denied')]);
+                }
+
+                continue;
+            }
+
+            $admin->revokeRole($user, $roleKey, $actor);
+        }
+
+        return back()->with('success', __('lba.settings.roles_updated', ['name' => (string) $user->name]));
     }
 
     public function setPassword(Request $request, User $user, PasswordSetter $setter): RedirectResponse

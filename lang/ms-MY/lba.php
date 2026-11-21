@@ -1492,6 +1492,15 @@ return [
         'database_unavailable' => 'Pangkalan data rakan ini belum sedia. Hubungi pentadbir platform untuk menyelesaikan penyediaan.',
     ],
 
+    // ----------------------------------------------- Langganan rakan tidak aktif
+    'subscription' => [
+        'inactive_badge' => 'Langganan Tidak Aktif',
+        'inactive_title' => 'Langganan anda tidak aktif',
+        'inactive_tenant' => 'Rakan: :tenant',
+        'inactive_body' => 'Tempoh langganan anda telah tamat atau statusnya tidak aktif, jadi anda belum boleh menggunakan aplikasi dan modulnya.',
+        'inactive_help' => 'Sila hubungi Prinsipal untuk memperbaharui atau mengaktifkan semula langganan anda.',
+    ],
+
     // ------------------------------------------------------------ Widget chrome
     'widget' => [
         'platform_heading' => 'Petunjuk Utama Platform',
@@ -2019,6 +2028,7 @@ return [
         'assign_owner' => 'Tetapkan pemilik',
         'edit_roles' => 'Ubah peranan',
         'roles_updated' => 'Peranan keahlian dikemas kini.',
+        'roles_escalation_denied' => 'Anda tidak boleh memberikan peranan dengan tahap tindakan lebih tinggi (CRUD) daripada akses anda sendiri.',
         'member_suspend' => 'Gantung',
         'member_activate' => 'Aktifkan',
         'member_revoke' => 'Batalkan',
@@ -2491,6 +2501,7 @@ return [
         'no_members' => 'Tiada ahli berpaut kepada tenant ini.',
         'save_roles' => 'Simpan peranan',
         'roles_updated' => 'Peranan ahli dikemas kini.',
+        'roles_escalation_denied' => 'Anda tidak boleh memberikan peranan dengan tahap tindakan lebih tinggi (CRUD) daripada akses anda sendiri.',
         'matrix' => 'Matriks Peranan → Kebenaran',
         'col_role' => 'Peranan',
         'col_permissions' => 'Kebenaran',
@@ -2542,6 +2553,7 @@ return [
         'grant_denied' => 'Peranan tidak dapat diberikan.',
         'revoked' => 'Peranan platform dibatalkan.',
         'revoke_denied' => 'Peranan tidak dapat dibatalkan.',
+        'roles_updated' => 'Peranan platform :name dikemas kini.',
     ],
 
     'roles' => [
@@ -2562,6 +2574,15 @@ return [
         'tenant_finance' => 'Kewangan Tenant',
         'patient_customer' => 'Pesakit / Pelanggan',
         'ai_service' => 'Perkhidmatan AI (mesin)',
+    ],
+
+    // -------------------------------- Requirement 3.a — CRUD vs CRU action level
+    'action_scope' => [
+        'column' => 'Tahap tindakan',
+        'cru' => 'CRU',
+        'crud' => 'CRUD',
+        'cru_hint' => 'Lihat, tambah, ubah — tanpa hapus.',
+        'crud_hint' => 'Lihat, tambah, ubah dan hapus.',
     ],
 
     // -------------------------------------- WS6.E — five user categories

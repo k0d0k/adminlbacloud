@@ -20,6 +20,8 @@ final class StaffInvitationOutcome
 
     public const STATUS_PRINCIPAL_FORBIDDEN = 'principal_forbidden';
 
+    public const STATUS_ESCALATION_FORBIDDEN = 'escalation_forbidden';
+
     public const STATUS_INVALID = 'invalid';
 
     private function __construct(
@@ -43,6 +45,16 @@ final class StaffInvitationOutcome
     public static function principalForbidden(): self
     {
         return new self(self::STATUS_PRINCIPAL_FORBIDDEN);
+    }
+
+    /**
+     * Requirement 3.b / 5 — the actor tried to confer a role whose action level
+     * (CRU/CRUD) exceeds their own. The invitation is refused outright so a CRU
+     * actor can never escalate an invitee to CRUD.
+     */
+    public static function escalationForbidden(): self
+    {
+        return new self(self::STATUS_ESCALATION_FORBIDDEN);
     }
 
     public static function invalid(): self

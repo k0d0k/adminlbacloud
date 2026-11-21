@@ -8,6 +8,7 @@ use App\Http\Controllers\Principal\BrandTenantController;
 use App\Http\Controllers\Principal\CrudGeneratorController;
 use App\Http\Controllers\Principal\FeatureAccessController;
 use App\Http\Controllers\Principal\GlobalSettingsController;
+use App\Http\Controllers\Principal\MenuController;
 use App\Http\Controllers\Principal\ModulePackageController;
 use App\Http\Controllers\Principal\PaymentGatewayController;
 use App\Http\Controllers\Principal\SinaController;
@@ -254,6 +255,7 @@ Route::prefix('principal')->name('principal.tailadmin.')
             ->controller(UserController::class)
             ->group(function (): void {
                 Route::get('/', 'index')->name('index');
+                Route::patch('/{user}/roles', 'updateRoles')->name('roles');
                 Route::patch('/{user}/password', 'setPassword')->name('password');
                 Route::post('/{user}/password-reset', 'sendReset')->name('password-reset');
             });
@@ -264,7 +266,24 @@ Route::prefix('principal')->name('principal.tailadmin.')
             ->group(function (): void {
                 Route::get('/', 'index')->name('index');
                 Route::post('/preview', 'preview')->name('preview');
+                Route::post('/generate', 'generate')->name('generate');
                 Route::post('/export', 'export')->name('export');
+            });
+
+        // Menu Dinamis — the per-group navigation builder. The Principal
+        // composes the sidebar per panel and per group, nests entries with
+        // drag-and-drop and re-derives every rule on the server side. Gated on
+        // the platform access-management capability because a menu entry is an
+        // access surface, not a cosmetic one.
+        Route::prefix('menus')->name('menus.')
+            ->middleware('can:'.PermissionKey::PLATFORM_RBAC_MANAGE)
+            ->controller(MenuController::class)
+            ->group(function (): void {
+                Route::get('/', 'index')->name('index');
+                Route::post('/', 'store')->name('store');
+                Route::post('/reorder', 'reorder')->name('reorder');
+                Route::patch('/{menu}', 'update')->name('update');
+                Route::delete('/{menu}', 'destroy')->name('destroy');
             });
 
         // Website CMS — Principal edits the LBA Cloud public frontpage.

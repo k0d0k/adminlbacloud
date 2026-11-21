@@ -137,6 +137,14 @@
         </a>
     @endcan
 
+    @can(App\Platform\Access\PermissionKey::PLATFORM_RBAC_MANAGE)
+        @php($menusLabel = __('principal.menus.title'))
+        <a class="principal-link" href="{{ route('principal.tailadmin.menus.index') }}" @if (request()->routeIs('principal.tailadmin.menus.*')) aria-current="page" @endif title="{{ $menusLabel }}">
+            <x-filament::icon :icon="Heroicon::OutlinedBars3BottomLeft" class="principal-link__icon size-5" />
+            <span class="principal-link__label">{{ $menusLabel }}</span>
+        </a>
+    @endcan
+
     @can(App\Platform\Crud\BrandCrudDefinition::ABILITY)
         <p class="principal-sidebar__group mt-4 px-3 text-xs font-semibold tracking-wide uppercase">{{ __('principal.crud.group') }}</p>
         @php($crudLabel = __('principal.crud.title'))
@@ -145,4 +153,15 @@
             <span class="principal-link__label">{{ $crudLabel }}</span>
         </a>
     @endcan
+
+    {{-- Menu Dinamis — the groups and entries the Principal composed in the
+         navigation builder, nested exactly as dragged. `treeFor()` re-derives
+         visibility for the acting principal, so an entry gated by a permission
+         or role they lack never renders here. --}}
+    @foreach (App\Models\Menu::treeFor(auth()->user(), App\Models\Menu::PANEL_PRINCIPAL) as $dynamicGroup)
+        <p class="principal-sidebar__group mt-4 px-3 text-xs font-semibold tracking-wide uppercase">{{ $dynamicGroup['group_label'] }}</p>
+        @foreach ($dynamicGroup['items'] as $dynamicItem)
+            @include('principal.layouts._menu-item', ['item' => $dynamicItem])
+        @endforeach
+    @endforeach
 </nav>

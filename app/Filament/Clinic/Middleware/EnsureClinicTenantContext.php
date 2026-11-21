@@ -6,6 +6,7 @@ use App\Filament\Clinic\Pages\SelectTenant;
 use App\Models\User;
 use App\Platform\Access\Contracts\ManagesTenantContext;
 use App\Platform\Access\TenantLoginHint;
+use App\Platform\Subscriptions\TenantSubscriptionGate;
 use App\Platform\Tenancy\TenantDatabaseReadiness;
 use Closure;
 use Filament\Facades\Filament;
@@ -34,12 +35,19 @@ use Symfony\Component\HttpFoundation\Response;
  * tenant or sign out. When a verified context exists but the tenant's isolated
  * database is not ready (provisioned-but-not-migrated, failed or dropped), the
  * request is denied with a useful message rather than failing mid-query.
+ *
+ * Requirement 3.a — subscription gate: when a verified context exists but the
+ * tenant holds no LIVE subscription (period ended, cancelled, expired,
+ * suspended), the Mitra is sent to the "hubungi Principal" notice instead of
+ * the workspace. The check runs on every request, so a licence that lapses
+ * mid-session closes the workspace at once rather than at next login.
  */
 class EnsureClinicTenantContext
 {
     public function __construct(
         private readonly ManagesTenantContext $context,
         private readonly TenantDatabaseReadiness $readiness,
+        private readonly TenantSubscriptionGate $subscriptions,
     ) {}
 
     public function handle(Request $request, Closure $next): Response
@@ -66,6 +74,15 @@ class EnsureClinicTenantContext
                 abort(503, __('lba.tenant_guard.database_unavailable'));
             }
 
+            // Requirement 3.a — a lapsed subscription means no workspace. The
+            // Mitra keeps their session but is pointed at the notice that asks
+            // them to contact the Principal; nothing tenant-scoped is served.
+            // A tenant with no subscription on file is not "lapsed" and keeps
+            // the existing membership + database contract.
+            if ($tenantId !== null && $this->subscriptions->hasLapsed($tenantId)) {
+                return redirect()->route('clinic.subscription.inactive');
+            }
+
             return $next($request);
         }
 
@@ -83,6 +100,7 @@ class EnsureClinicTenantContext
         return in_array($name, [
             SelectTenant::getRouteName(Filament::getPanel('clinic')),
             'filament.clinic.auth.logout',
+            'clinic.subscription.inactive',
         ], true);
     }
 }

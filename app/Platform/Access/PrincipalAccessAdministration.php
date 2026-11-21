@@ -5,6 +5,7 @@ namespace App\Platform\Access;
 use App\Models\PrincipalRoleAssignment;
 use App\Models\Role;
 use App\Models\User;
+use App\Platform\Access\Contracts\ResolvesRoles;
 use App\Platform\ModuleRegistry\Models\ModuleAuditLog;
 use App\Platform\ModuleRegistry\ModuleScope;
 use Illuminate\Support\Collection;
@@ -24,12 +25,18 @@ use Illuminate\Support\Collection;
  */
 final class PrincipalAccessAdministration
 {
+    public function __construct(private readonly ResolvesRoles $roles) {}
+
     /**
      * Grant a platform governance role to an identity.
      *
      * Idempotent: an identity that already holds the role actively is left
      * untouched. A previously revoked or pending assignment is reactivated
      * rather than duplicated.
+     *
+     * Requirement 3.b / 5: the acting principal may only grant a role whose
+     * action level (CRU/CRUD) they themselves hold — a CRU principal can never
+     * escalate an identity to a CRUD role.
      */
     public function assignRole(User $target, string $roleKey, ?User $actor = null): bool
     {
@@ -37,6 +44,12 @@ final class PrincipalAccessAdministration
 
         if ($role === null) {
             $this->audit($target, 'grant_role', ModuleAuditLog::RESULT_DENIED, 'role_not_assignable', $actor, $roleKey);
+
+            return false;
+        }
+
+        if ($actor !== null && ! RbacCatalog::mayGrantRole($this->roles->allActiveRoleKeys($actor), $roleKey)) {
+            $this->audit($target, 'grant_role', ModuleAuditLog::RESULT_DENIED, 'action_scope_escalation', $actor, $roleKey);
 
             return false;
         }

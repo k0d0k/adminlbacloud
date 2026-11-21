@@ -315,3 +315,164 @@ if (capture) {
     window.addEventListener('pagehide', stop, { once: true });
     navigator.mediaDevices?.addEventListener?.('devicechange', enumerateDevices);
 }
+
+// Menu Dinamis — nested drag-and-drop for the per-group navigation builder.
+//
+// Dragging a row's handle onto ANOTHER row nests it as that row's child;
+// dropping it on the thin gap between rows makes it a sibling at that position.
+// The visible arrangement is serialized to `{id, parent_id, sort_order}` and
+// POSTed to the reorder endpoint, which re-checks every id against the panel
+// before writing. Nothing here is an authorization decision — the server owns
+// that; this only captures the position the Principal dragged.
+const menuBuilder = document.querySelector('[data-menu-builder]');
+
+if (menuBuilder) {
+    const reorderUrl = menuBuilder.dataset.menuReorder;
+    const token = menuBuilder.dataset.menuToken;
+    const errorMessage = menuBuilder.dataset.menuError;
+    const saveButton = menuBuilder.querySelector('[data-menu-save]');
+
+    let dragged = null;
+
+    const clearHighlight = () => {
+        menuBuilder.querySelectorAll('[data-menu-row].ring-2').forEach((row) => {
+            row.classList.remove('ring-2', 'ring-brand-400');
+        });
+    };
+
+    const childrenList = (item) => {
+        let list = item.querySelector(':scope > ul.menu-tree');
+
+        if (!list) {
+            list = document.createElement('ul');
+            list.className = 'menu-tree mt-2 ms-6 grid gap-2 border-s border-slate-200 ps-3';
+            list.setAttribute('role', 'list');
+            const gap = document.createElement('li');
+            gap.className = 'menu-tree__gap h-2 rounded bg-slate-100';
+            gap.setAttribute('data-menu-drop', '');
+            gap.setAttribute('aria-hidden', 'true');
+            list.append(gap);
+            item.append(list);
+        }
+
+        return list;
+    };
+
+    const canDrop = (target) => dragged && target && target !== dragged && !dragged.contains(target);
+
+    // The handle is the only draggable element so the row's link and buttons
+    // stay clickable; the drag moves the whole `li`.
+    menuBuilder.querySelectorAll('[data-menu-handle]').forEach((handle) => {
+        handle.setAttribute('draggable', 'true');
+
+        handle.addEventListener('dragstart', (event) => {
+            dragged = handle.closest('[data-menu-id]');
+            event.dataTransfer.effectAllowed = 'move';
+            event.dataTransfer.setData('text/plain', dragged?.dataset.menuId ?? '');
+            dragged?.classList.add('opacity-50');
+        });
+
+        handle.addEventListener('dragend', () => {
+            dragged?.classList.remove('opacity-50');
+            dragged = null;
+            clearHighlight();
+        });
+    });
+
+    // Drop onto a row → becomes that row's child (appended to its child list).
+    menuBuilder.querySelectorAll('[data-menu-row]').forEach((row) => {
+        row.addEventListener('dragover', (event) => {
+            if (!canDrop(row.closest('[data-menu-id]'))) {
+                return;
+            }
+            event.preventDefault();
+            row.classList.add('ring-2', 'ring-brand-400');
+        });
+
+        row.addEventListener('dragleave', () => row.classList.remove('ring-2', 'ring-brand-400'));
+
+        row.addEventListener('drop', (event) => {
+            const item = row.closest('[data-menu-id]');
+
+            if (!canDrop(item)) {
+                return;
+            }
+
+            event.preventDefault();
+            childrenList(item).append(dragged);
+            clearHighlight();
+        });
+    });
+
+    // Drop onto a gap → becomes a sibling inserted at that position.
+    menuBuilder.querySelectorAll('[data-menu-drop]').forEach((gap) => {
+        gap.addEventListener('dragover', (event) => {
+            if (!canDrop(gap)) {
+                return;
+            }
+            event.preventDefault();
+            gap.classList.add('bg-brand-200');
+        });
+
+        gap.addEventListener('dragleave', () => gap.classList.remove('bg-brand-200'));
+
+        gap.addEventListener('drop', (event) => {
+            if (!canDrop(gap)) {
+                return;
+            }
+
+            event.preventDefault();
+            gap.parentNode.insertBefore(dragged, gap);
+            clearHighlight();
+        });
+    });
+
+    const serialize = () => {
+        const nodes = [];
+
+        const walk = (list, parentId) => {
+            let order = 0;
+
+            list.querySelectorAll(':scope > [data-menu-id]').forEach((item) => {
+                const id = item.dataset.menuId;
+                nodes.push({ id, parent_id: parentId, sort_order: order });
+                order += 1;
+
+                const childList = item.querySelector(':scope > ul.menu-tree');
+                if (childList) {
+                    walk(childList, id);
+                }
+            });
+        };
+
+        menuBuilder.querySelectorAll('[data-menu-root]').forEach((root) => walk(root, null));
+
+        return nodes;
+    };
+
+    saveButton?.addEventListener('click', async () => {
+        try {
+            const response = await fetch(reorderUrl, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    'X-CSRF-TOKEN': token,
+                },
+                body: JSON.stringify({
+                    panel: menuBuilder.dataset.menuPanel,
+                    tree: serialize(),
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('reorder failed');
+            }
+
+            window.location.reload();
+        } catch (error) {
+            window.alert(errorMessage);
+        }
+    });
+}

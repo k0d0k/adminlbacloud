@@ -115,12 +115,43 @@ final class FeatureAccessController extends Controller
         ]);
 
         $keys = array_values(array_filter((array) ($data['role_keys'] ?? []), 'is_string'));
+
+        // Requirement 3.b / 5 — the acting principal may only assign roles whose
+        // action level (CRU/CRUD) they themselves hold; a CRU principal can
+        // never escalate a member to a CRUD role.
+        if (! $this->mayAssignAll($keys)) {
+            return to_route('principal.tailadmin.entitlements.index', ['tenant' => $tenant->getKey()])
+                ->withErrors(['role_keys' => __('lba.feature_access.roles_escalation_denied')]);
+        }
+
         $ids = Role::query()->whereIn('key', $keys)->pluck('id')->all();
 
         $membership->roles()->sync($ids);
 
         return to_route('principal.tailadmin.entitlements.index', ['tenant' => $tenant->getKey()])
             ->with('success', __('lba.feature_access.roles_updated'));
+    }
+
+    /**
+     * @param  list<string>  $roleKeys
+     */
+    private function mayAssignAll(array $roleKeys): bool
+    {
+        $actor = auth()->user();
+
+        if (! $actor instanceof User) {
+            return false;
+        }
+
+        $actorRoleKeys = app(\App\Platform\Access\Contracts\ResolvesRoles::class)->allActiveRoleKeys($actor);
+
+        foreach ($roleKeys as $roleKey) {
+            if (! RbacCatalog::mayGrantRole($actorRoleKeys, $roleKey)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private function validatedModuleKey(Request $request): string

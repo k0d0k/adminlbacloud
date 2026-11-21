@@ -5,6 +5,7 @@ use App\Filament\Shared\Middleware\CaptureTenantLoginHint;
 use App\Http\Controllers\Account\AccountPhotoController;
 use App\Http\Controllers\Account\EmailVerificationController;
 use App\Http\Controllers\BookingVerificationController;
+use App\Http\Controllers\Clinic\SubscriptionInactiveController;
 use App\Http\Controllers\Clinic\TenantShortcutController;
 use App\Http\Controllers\PatientEmailVerificationController;
 use App\Http\Controllers\PatientRegistrationController;
@@ -219,6 +220,21 @@ Route::post('/klinik/{slug}/booking', [VisitorBookingController::class, 'store']
 
 require __DIR__.'/principal.php';
 require __DIR__.'/clinic.php';
+
+/*
+ |--------------------------------------------------------------------------
+ | Subscription inactive notice (requirement 3.a.ii)
+ |--------------------------------------------------------------------------
+ |
+ | Where a Mitra is redirected when the Clinic gateway finds no live
+ | subscription for their verified tenant. It is registered OUTSIDE the Clinic
+ | panel path and the tenant gateway, so it renders without a ready tenant
+ | database and regardless of the workspace guard.
+ |
+ */
+Route::get('/langganan/nonaktif', SubscriptionInactiveController::class)
+    ->middleware('auth')
+    ->name('clinic.subscription.inactive');
 
 /*
  |--------------------------------------------------------------------------

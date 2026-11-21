@@ -6,6 +6,7 @@ use App\Models\Role;
 use App\Models\Tenant;
 use App\Models\TenantMembership;
 use App\Models\User;
+use App\Platform\Access\Contracts\ResolvesRoles;
 use Illuminate\Support\Str;
 
 /**
@@ -27,7 +28,10 @@ use Illuminate\Support\Str;
  */
 final class StaffInviter
 {
-    public function __construct(private readonly StaffInvitation $invitations) {}
+    public function __construct(
+        private readonly StaffInvitation $invitations,
+        private readonly ResolvesRoles $roles,
+    ) {}
 
     /**
      * @param  list<string>  $roleKeys  clinic-routable role keys for the invitee
@@ -45,6 +49,19 @@ final class StaffInviter
 
         if ($email === '' || $roleKeys === []) {
             return StaffInvitationOutcome::invalid();
+        }
+
+        // Requirement 3.b / 5 — an actor can never confer a role whose action
+        // level (CRU/CRUD) exceeds their own, so a mitra/principal that is CRU
+        // cannot escalate an invitee to a delete-capable role.
+        if ($actor instanceof User) {
+            $actorRoleKeys = $this->roles->allActiveRoleKeys($actor);
+
+            foreach ($roleKeys as $roleKey) {
+                if (! RbacCatalog::mayGrantRole($actorRoleKeys, (string) $roleKey)) {
+                    return StaffInvitationOutcome::escalationForbidden();
+                }
+            }
         }
 
         $user = User::query()->where('email', $email)->first();

@@ -14,6 +14,16 @@ Pasien / Dokter  ──►  LBA Cloud (SINA chat)  ──►  Open WebUI (Mac Mi
                           └─ dompet kredit + catatan pemakaian (central DB)
 ```
 
+> **Endpoint disarankan — SINA terkelola.** Bila platform menyediakan layanan
+> SINA terkelola, gunakan **`https://sina.lbacloud.com/`** sebagai **Base URL**
+> (protokol HTTPS + host publik, sesuai aturan endpoint publik). Bagian 1 di
+> bawah adalah opsi **menjalankan Open WebUI sendiri di Mac Mini M4** untuk
+> jaringan lokal (LAN) — berguna saat model dijalankan on-premise.
+>
+> Konfigurasi SINA tetap **per-mitra**: setiap mitra boleh memakai endpoint
+> terkelola `https://sina.lbacloud.com/` **atau** endpoint LAN-nya sendiri.
+> Tidak ada nilai default global yang diubah.
+
 ---
 
 ## 1. Siapkan Mac Mini M4
@@ -68,8 +78,9 @@ Masuk ke panel **Principal → Tata Kelola Platform → Integrasi SINA AI**
 1. Pada kartu **Endpoint Penyedia SINA**:
    - **Mitra** — pilih klinik/tenant yang memakai SINA.
    - **Penyedia** — pilih `OpenAI-compatible`.
-   - **Base URL** — `http://mac-mini.local:3000/api`
-     (atau `http://192.168.1.50:3000/api`).
+   - **Base URL** — endpoint terkelola **`https://sina.lbacloud.com/`**
+     (disarankan), atau endpoint Open WebUI Anda sendiri
+     `http://mac-mini.local:3000/api` / `http://192.168.1.50:3000/api`.
    - **Model** — nama model, mis. `qwen2.5:7b` (harus sama dengan yang
      di-`pull` di Ollama / tersedia di Open WebUI).
    - **API Key** — tempel kunci dari langkah 1.3. Disimpan **terenkripsi** dan

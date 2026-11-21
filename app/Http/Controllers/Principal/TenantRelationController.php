@@ -288,8 +288,33 @@ final class TenantRelationController extends Controller
             StaffInvitationOutcome::STATUS_INVITED => $redirect->with('success', __('lba.tenants.invited').' '.$outcome->activationUrl),
             StaffInvitationOutcome::STATUS_ALREADY_MEMBER => $redirect->withErrors(['email' => __('lba.tenants.invite_already_member')]),
             StaffInvitationOutcome::STATUS_PRINCIPAL_FORBIDDEN => $redirect->withErrors(['email' => __('lba.tenants.invite_principal_forbidden')]),
+            StaffInvitationOutcome::STATUS_ESCALATION_FORBIDDEN => $redirect->withErrors(['role_keys' => __('lba.tenants.roles_escalation_denied')]),
             default => $redirect->withErrors(['email' => __('lba.tenants.invite_failed')]),
         };
+    }
+
+    /**
+     * Requirement 3.b / 5 — an actor may only assign roles whose action level
+     * (CRU/CRUD) they themselves hold, so a CRU principal can never grant a
+     * delete-capable role.
+     *
+     * @param  list<string>  $roleKeys
+     */
+    private function mayAssignAll(?User $actor, array $roleKeys): bool
+    {
+        if (! $actor instanceof User) {
+            return false;
+        }
+
+        $actorRoleKeys = app(\App\Platform\Access\Contracts\ResolvesRoles::class)->allActiveRoleKeys($actor);
+
+        foreach ($roleKeys as $roleKey) {
+            if (! RbacCatalog::mayGrantRole($actorRoleKeys, $roleKey)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function updateMemberRoles(Request $request, Tenant $tenant, TenantMembership $membership): RedirectResponse
@@ -301,7 +326,16 @@ final class TenantRelationController extends Controller
             'role_keys.*' => ['string', Rule::in(RbacCatalog::membershipAssignableRoles())],
         ]);
 
-        $ids = Role::query()->whereIn('key', array_values(array_map('strval', $data['role_keys'])))->pluck('id')->all();
+        $keys = array_values(array_map('strval', $data['role_keys']));
+
+        // Requirement 3.b / 5 — the acting principal may only assign roles whose
+        // action level (CRU/CRUD) they themselves hold.
+        if (! $this->mayAssignAll($request->user(), $keys)) {
+            return to_route('principal.tailadmin.tenants.relations', $tenant)
+                ->withErrors(['role_keys' => __('lba.tenants.roles_escalation_denied')]);
+        }
+
+        $ids = Role::query()->whereIn('key', $keys)->pluck('id')->all();
         $membership->roles()->sync($ids);
 
         return to_route('principal.tailadmin.tenants.relations', $tenant)

@@ -376,6 +376,87 @@ final class RbacCatalog
         return self::rolePermissions()[$roleKey] ?? [];
     }
 
+    /**
+     * Requirement 3.a — the CRUD vs CRU action level per role.
+     *
+     * Only the roles that own their workspace may perform a DESTRUCTIVE action
+     * (delete): the Principal Super Admin (mirrors the existing Brand/Tenant
+     * delete policies) and the tenant Owner/Admin in their own tenant. Every
+     * other role is CRU — it can view/create/update but never remove.
+     *
+     * The mapping is exhaustive over {@see RoleKey::ALL} so no role can ever
+     * resolve to "unknown" and silently inherit delete rights.
+     *
+     * @return array<string, string>
+     */
+    public static function roleActionScopes(): array
+    {
+        $crud = [
+            RoleKey::PRINCIPAL_SUPER_ADMIN,
+            RoleKey::TENANT_OWNER,
+            RoleKey::TENANT_ADMIN,
+        ];
+
+        $scopes = [];
+
+        foreach (RoleKey::ALL as $key) {
+            $scopes[$key] = in_array($key, $crud, true) ? ActionScope::CRUD : ActionScope::CRU;
+        }
+
+        return $scopes;
+    }
+
+    public static function roleActionScope(string $roleKey): string
+    {
+        return self::roleActionScopes()[$roleKey] ?? ActionScope::CRU;
+    }
+
+    public static function roleAllowsDelete(string $roleKey): bool
+    {
+        return ActionScope::allowsDelete(self::roleActionScope($roleKey));
+    }
+
+    /**
+     * The highest action level held by a set of role keys. An empty set is CRU
+     * (fail-closed): an actor holding nothing can never confer delete rights.
+     *
+     * @param  iterable<string>  $roleKeys
+     */
+    public static function highestActionScope(iterable $roleKeys): string
+    {
+        foreach ($roleKeys as $roleKey) {
+            if (self::roleAllowsDelete((string) $roleKey)) {
+                return ActionScope::CRUD;
+            }
+        }
+
+        return ActionScope::CRU;
+    }
+
+    /**
+     * Requirement 3.b / 5 — escalation guard.
+     *
+     * An actor may GRANT a role only when their OWN highest action level is at
+     * least the target role's level: a CRU actor (User Principal, or a mitra
+     * admin) can never grant a CRUD role, so an assignment can never be used to
+     * escalate CRU → CRUD. A null actor means a trusted system context (seeders,
+     * console) where the guard is intentionally bypassed.
+     *
+     * @param  iterable<string>|null  $actorRoleKeys
+     */
+    public static function mayGrantRole(?iterable $actorRoleKeys, string $targetRoleKey): bool
+    {
+        if ($actorRoleKeys === null) {
+            return true;
+        }
+
+        if (! self::roleAllowsDelete($targetRoleKey)) {
+            return true;
+        }
+
+        return ActionScope::allowsDelete(self::highestActionScope($actorRoleKeys));
+    }
+
     public static function roleName(string $roleKey): string
     {
         return ucwords(str_replace('_', ' ', $roleKey));

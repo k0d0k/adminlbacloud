@@ -3,6 +3,7 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\PatientApiToken;
+use App\Models\PrincipalRoleAssignment;
 use App\Models\Tenant;
 use App\Models\TenantMembership;
 use App\Models\User;
@@ -307,6 +308,48 @@ class AdminPasswordManagementTest extends TestCase
         $this->actingAs($actor)
             ->get('/principal/users')
             ->assertForbidden();
+    }
+
+    public function test_the_users_page_offers_a_platform_role_assignment_form(): void
+    {
+        $principal = $this->principal();
+        $target = User::factory()->create(['name' => 'Synthetic Target']);
+
+        $this->actingAs($principal)
+            ->get('/principal/users')
+            ->assertOk()
+            ->assertSee(__('principal.users.roles_action'))
+            ->assertSee(route('principal.tailadmin.users.roles', $target))
+            ->assertSee(__('lba.roles.'.RoleKey::PRINCIPAL_SUPER_ADMIN));
+    }
+
+    public function test_a_principal_can_grant_and_revoke_a_platform_role_through_the_endpoint(): void
+    {
+        $principal = $this->principal();
+        $target = User::factory()->create();
+
+        $this->actingAs($principal)
+            ->patch('/principal/users/'.$target->getKey().'/roles', [
+                'role_keys' => [RoleKey::PRINCIPAL_FINANCE],
+            ])
+            ->assertRedirect()
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseHas('principal_role_assignments', [
+            'user_id' => $target->getKey(),
+            'status' => PrincipalRoleAssignment::STATUS_ACTIVE,
+        ]);
+
+        // The submitted set is the DESIRED state — an empty set revokes.
+        $this->actingAs($principal)
+            ->patch('/principal/users/'.$target->getKey().'/roles', ['role_keys' => []])
+            ->assertRedirect()
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseMissing('principal_role_assignments', [
+            'user_id' => $target->getKey(),
+            'status' => PrincipalRoleAssignment::STATUS_ACTIVE,
+        ]);
     }
 
     public function test_a_principal_can_set_a_password_through_the_endpoint(): void

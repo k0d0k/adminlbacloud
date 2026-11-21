@@ -41,7 +41,11 @@
                             <td class="px-4 py-3 sm:px-5">
                                 <div class="flex flex-wrap gap-1">
                                     @forelse ($roleKeys as $roleKey)
-                                        <span class="inline-block rounded bg-slate-100 px-2 py-0.5 text-xs text-navy-900">{{ __('lba.roles.'.$roleKey) }}</span>
+                                        @php($scope = $roleActionScopes[$roleKey] ?? \App\Platform\Access\ActionScope::CRU)
+                                        <span class="inline-flex items-center gap-1 rounded bg-slate-100 px-2 py-0.5 text-xs text-navy-900" title="{{ __("lba.action_scope.{$scope}_hint") }}">
+                                            {{ __('lba.roles.'.$roleKey) }}
+                                            <span class="rounded px-1 text-[10px] font-semibold uppercase {{ $scope === \App\Platform\Access\ActionScope::CRUD ? 'bg-brand-100 text-brand-700' : 'bg-slate-200 text-slate-600' }}">{{ __('lba.action_scope.'.$scope) }}</span>
+                                        </span>
                                     @empty
                                         <span class="text-slate-500">—</span>
                                     @endforelse
@@ -79,6 +83,29 @@
                             </td>
                             <td class="px-4 py-3 sm:px-5">
                                 <div class="grid gap-2">
+                                    <details>
+                                        <summary class="cursor-pointer text-sm font-medium text-brand-700">{{ __('principal.users.roles_action') }}</summary>
+                                        @php($activePrincipalRoles = $user->principalRoleAssignments
+                                            ->filter(fn ($assignment) => $assignment->isActive())
+                                            ->pluck('role.key')
+                                            ->filter()
+                                            ->all())
+                                        <form method="post" action="{{ route('principal.tailadmin.users.roles', $user) }}" class="mt-2 grid gap-2">
+                                            @csrf
+                                            @method('PATCH')
+                                            <div class="grid gap-1 text-xs text-slate-600">
+                                                @foreach ($principalRoles as $roleKey)
+                                                    @php($scope = $roleActionScopes[$roleKey] ?? \App\Platform\Access\ActionScope::CRU)
+                                                    <label class="inline-flex items-center gap-2">
+                                                        <input type="checkbox" name="role_keys[]" value="{{ $roleKey }}" @checked(in_array($roleKey, $activePrincipalRoles, true))>
+                                                        <span>{{ __('lba.roles.'.$roleKey) }}</span>
+                                                        <span class="rounded px-1 text-[10px] font-semibold uppercase {{ $scope === \App\Platform\Access\ActionScope::CRUD ? 'bg-brand-100 text-brand-700' : 'bg-slate-200 text-slate-600' }}">{{ __('lba.action_scope.'.$scope) }}</span>
+                                                    </label>
+                                                @endforeach
+                                            </div>
+                                            <button class="principal-button principal-button-primary" type="submit">{{ __('principal.users.roles_submit') }}</button>
+                                        </form>
+                                    </details>
                                     <form method="post" action="{{ route('principal.tailadmin.users.password-reset', $user) }}">
                                         @csrf
                                         <button class="principal-button" type="submit">{{ __('lba.password_reset.super_admin_action') }}</button>

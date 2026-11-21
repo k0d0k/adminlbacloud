@@ -1,0 +1,33 @@
+<?php
+
+return [
+    'title' => 'Book a Visit',
+    'subtitle' => 'Request an appointment at :clinic. This is not yet a confirmed schedule.',
+    'back' => 'Back to the clinic page',
+    'name' => 'Full name',
+    'email' => 'Email',
+    'phone' => 'Phone number',
+    'optional' => 'optional',
+    'branch' => 'Branch',
+    'date' => 'Date',
+    'show_slots' => 'Show slots',
+    'service' => 'Service type',
+    'choose_slot' => 'Choose a slot',
+    'no_slots' => 'No slots are available for that branch and date. Please choose another branch or date.',
+    'no_branch' => 'No active branch is available for booking right now.',
+    'privacy' => 'I agree to the processing of my personal data under the clinic privacy policy.',
+    'submit' => 'Send Booking Request',
+    'verify_hint' => 'After submitting, we will email you a verification link. The appointment is only confirmed once you verify your email and continue in the patient portal.',
+    'pending' => 'Your booking request is awaiting email verification. It is not yet a confirmed schedule. Please check your inbox.',
+    'verified' => 'Your email has been verified. Please continue to complete your booking.',
+    'email_subject' => 'Verify your booking — :clinic',
+    'email_intro' => 'Hello :name, thank you for requesting a booking at :clinic.',
+    'email_slot' => 'Requested slot: :slot',
+    'email_action' => 'Verify booking',
+    'email_expiry' => 'This link is valid for :hours hours.',
+    'email_footer' => 'If you did not request this booking, you can ignore this email.',
+    'errors' => [
+        'slot_unavailable' => 'The selected slot is no longer available. Please choose another slot.',
+        'branch' => 'The selected branch is not valid.',
+    ],
+];

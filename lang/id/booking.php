@@ -1,0 +1,33 @@
+<?php
+
+return [
+    'title' => 'Booking Kunjungan',
+    'subtitle' => 'Ajukan jadwal kunjungan Anda di :clinic. Pengajuan ini belum menjadi jadwal terkonfirmasi.',
+    'back' => 'Kembali ke halaman klinik',
+    'name' => 'Nama lengkap',
+    'email' => 'Email',
+    'phone' => 'Nomor HP',
+    'optional' => 'opsional',
+    'branch' => 'Cabang',
+    'date' => 'Tanggal',
+    'show_slots' => 'Tampilkan slot',
+    'service' => 'Jenis Layanan',
+    'choose_slot' => 'Pilih slot',
+    'no_slots' => 'Belum ada slot tersedia pada cabang dan tanggal tersebut. Silakan pilih cabang atau tanggal lain.',
+    'no_branch' => 'Belum ada cabang aktif yang tersedia untuk booking saat ini.',
+    'privacy' => 'Saya menyetujui pemrosesan data pribadi saya sesuai kebijakan privasi klinik.',
+    'submit' => 'Kirim Pengajuan Booking',
+    'verify_hint' => 'Setelah mengirim, kami akan mengirim tautan verifikasi ke email Anda. Jadwal baru terkonfirmasi setelah Anda memverifikasi email dan melanjutkan di portal pasien.',
+    'pending' => 'Pengajuan booking Anda menunggu verifikasi email. Ini belum menjadi jadwal terkonfirmasi. Silakan periksa kotak masuk Anda.',
+    'verified' => 'Email Anda berhasil diverifikasi. Silakan lanjutkan untuk menyelesaikan booking Anda.',
+    'email_subject' => 'Verifikasi booking Anda — :clinic',
+    'email_intro' => 'Halo :name, terima kasih telah mengajukan booking di :clinic.',
+    'email_slot' => 'Jadwal yang diajukan: :slot',
+    'email_action' => 'Verifikasi booking',
+    'email_expiry' => 'Tautan ini berlaku selama :hours jam.',
+    'email_footer' => 'Jika Anda tidak merasa mengajukan booking, abaikan email ini.',
+    'errors' => [
+        'slot_unavailable' => 'Slot yang Anda pilih sudah tidak tersedia. Silakan pilih slot lain.',
+        'branch' => 'Cabang yang Anda pilih tidak valid.',
+    ],
+];

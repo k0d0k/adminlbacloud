@@ -1,0 +1,33 @@
+<?php
+
+return [
+    'title' => 'Tempahan Kunjungan',
+    'subtitle' => 'Mohon jadual kunjungan anda di :clinic. Ini belum menjadi jadual yang disahkan.',
+    'back' => 'Kembali ke halaman klinik',
+    'name' => 'Nama penuh',
+    'email' => 'E-mel',
+    'phone' => 'Nombor telefon',
+    'optional' => 'pilihan',
+    'branch' => 'Cawangan',
+    'date' => 'Tarikh',
+    'show_slots' => 'Tunjuk slot',
+    'service' => 'Jenis perkhidmatan',
+    'choose_slot' => 'Pilih slot',
+    'no_slots' => 'Tiada slot tersedia untuk cawangan dan tarikh tersebut. Sila pilih cawangan atau tarikh lain.',
+    'no_branch' => 'Tiada cawangan aktif tersedia untuk tempahan buat masa ini.',
+    'privacy' => 'Saya bersetuju dengan pemprosesan data peribadi saya menurut dasar privasi klinik.',
+    'submit' => 'Hantar Permohonan Tempahan',
+    'verify_hint' => 'Selepas menghantar, kami akan menghantar pautan pengesahan ke e-mel anda. Jadual hanya disahkan selepas anda mengesahkan e-mel dan meneruskan di portal pesakit.',
+    'pending' => 'Permohonan tempahan anda menunggu pengesahan e-mel. Ini belum menjadi jadual yang disahkan. Sila semak peti masuk anda.',
+    'verified' => 'E-mel anda berjaya disahkan. Sila teruskan untuk melengkapkan tempahan anda.',
+    'email_subject' => 'Sahkan tempahan anda — :clinic',
+    'email_intro' => 'Helo :name, terima kasih kerana memohon tempahan di :clinic.',
+    'email_slot' => 'Slot yang diminta: :slot',
+    'email_action' => 'Sahkan tempahan',
+    'email_expiry' => 'Pautan ini sah selama :hours jam.',
+    'email_footer' => 'Jika anda tidak memohon tempahan ini, abaikan e-mel ini.',
+    'errors' => [
+        'slot_unavailable' => 'Slot yang dipilih tidak lagi tersedia. Sila pilih slot lain.',
+        'branch' => 'Cawangan yang dipilih tidak sah.',
+    ],
+];

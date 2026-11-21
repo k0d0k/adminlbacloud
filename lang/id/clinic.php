@@ -1,0 +1,80 @@
+<?php
+
+return [
+    'site' => [
+        'nav' => 'Website',
+        'title' => 'Kelola Website Klinik',
+        'sections' => [
+            'hero' => 'Hero',
+            'about' => 'Tentang',
+            'services' => 'Layanan',
+            'features' => 'Keunggulan',
+            'faq' => 'FAQ',
+            'contact' => 'Kontak',
+            'seo' => 'SEO',
+        ],
+        'hero' => [
+            'title' => 'Judul',
+            'subtitle' => 'Subjudul',
+            'cta_text' => 'Teks tombol',
+            'cta_url' => 'URL tombol',
+        ],
+        'about' => [
+            'text' => 'Teks tentang',
+        ],
+        'services' => [
+            'title' => 'Judul layanan',
+            'description' => 'Deskripsi',
+            'add' => 'Tambah layanan',
+        ],
+        'features' => [
+            'title' => 'Judul keunggulan',
+            'description' => 'Deskripsi',
+            'add' => 'Tambah keunggulan',
+        ],
+        'faq' => [
+            'question' => 'Pertanyaan',
+            'answer' => 'Jawaban',
+            'add' => 'Tambah FAQ',
+        ],
+        'contact' => [
+            'email' => 'Email',
+            'phone' => 'Telepon',
+            'whatsapp' => 'WhatsApp',
+            'address' => 'Alamat',
+        ],
+        'seo' => [
+            'title' => 'Judul SEO',
+            'description' => 'Deskripsi SEO',
+            'og_image' => 'Gambar Open Graph (URL)',
+        ],
+        'save_draft' => 'Simpan Draf',
+        'publish' => 'Publikasikan',
+        'preview' => 'Pratinjau',
+        'revisions' => 'Riwayat Revisi',
+        'revision' => [
+            'locale' => 'Bahasa',
+            'status' => 'Status',
+            'date' => 'Tanggal',
+        ],
+        'restore' => 'Pulihkan',
+        'draft_saved' => 'Draf berhasil disimpan.',
+        'published' => 'Konten berhasil dipublikasikan.',
+        'restored' => 'Revisi berhasil dipulihkan sebagai draf.',
+        'no_draft' => 'Tidak ada draf untuk dipublikasikan pada bahasa ini.',
+        'revision_not_found' => 'Revisi tidak ditemukan.',
+        'media' => [
+            'title' => 'Media',
+            'choose' => 'Pilih gambar',
+            'alt_text' => 'Teks alternatif',
+            'hint' => 'JPG, PNG, WEBP, GIF, atau SVG. Maksimal :size KB.',
+            'submit' => 'Unggah',
+            'empty' => 'Belum ada media.',
+            'delete' => 'Hapus',
+            'delete_prompt' => 'Hapus media ini?',
+            'uploaded' => 'Media berhasil diunggah.',
+            'deleted' => 'Media berhasil dihapus.',
+            'invalid' => 'Berkas media tidak valid.',
+        ],
+    ],
+];

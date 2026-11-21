@@ -1,0 +1,80 @@
+<?php
+
+return [
+    'site' => [
+        'nav' => 'Laman Web',
+        'title' => 'Urus Laman Web Klinik',
+        'sections' => [
+            'hero' => 'Hero',
+            'about' => 'Tentang',
+            'services' => 'Perkhidmatan',
+            'features' => 'Keistimewaan',
+            'faq' => 'FAQ',
+            'contact' => 'Hubungi',
+            'seo' => 'SEO',
+        ],
+        'hero' => [
+            'title' => 'Tajuk',
+            'subtitle' => 'Sari kata',
+            'cta_text' => 'Teks butang',
+            'cta_url' => 'URL butang',
+        ],
+        'about' => [
+            'text' => 'Teks tentang',
+        ],
+        'services' => [
+            'title' => 'Tajuk perkhidmatan',
+            'description' => 'Penerangan',
+            'add' => 'Tambah perkhidmatan',
+        ],
+        'features' => [
+            'title' => 'Tajuk keistimewaan',
+            'description' => 'Penerangan',
+            'add' => 'Tambah keistimewaan',
+        ],
+        'faq' => [
+            'question' => 'Soalan',
+            'answer' => 'Jawapan',
+            'add' => 'Tambah FAQ',
+        ],
+        'contact' => [
+            'email' => 'E-mel',
+            'phone' => 'Telefon',
+            'whatsapp' => 'WhatsApp',
+            'address' => 'Alamat',
+        ],
+        'seo' => [
+            'title' => 'Tajuk SEO',
+            'description' => 'Penerangan SEO',
+            'og_image' => 'Imej Open Graph (URL)',
+        ],
+        'save_draft' => 'Simpan Draf',
+        'publish' => 'Terbitkan',
+        'preview' => 'Pratonton',
+        'revisions' => 'Sejarah Semakan',
+        'revision' => [
+            'locale' => 'Bahasa',
+            'status' => 'Status',
+            'date' => 'Tarikh',
+        ],
+        'restore' => 'Pulihkan',
+        'draft_saved' => 'Draf berjaya disimpan.',
+        'published' => 'Kandungan berjaya diterbitkan.',
+        'restored' => 'Semakan dipulihkan sebagai draf.',
+        'no_draft' => 'Tiada draf untuk diterbitkan bagi bahasa ini.',
+        'revision_not_found' => 'Semakan tidak ditemui.',
+        'media' => [
+            'title' => 'Media',
+            'choose' => 'Pilih imej',
+            'alt_text' => 'Teks alternatif',
+            'hint' => 'JPG, PNG, WEBP, GIF, atau SVG. Maksimum :size KB.',
+            'submit' => 'Muat naik',
+            'empty' => 'Belum ada media.',
+            'delete' => 'Padam',
+            'delete_prompt' => 'Padam media ini?',
+            'uploaded' => 'Media berjaya dimuat naik.',
+            'deleted' => 'Media berjaya dipadam.',
+            'invalid' => 'Fail media tidak sah.',
+        ],
+    ],
+];

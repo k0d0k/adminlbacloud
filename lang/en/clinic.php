@@ -1,0 +1,80 @@
+<?php
+
+return [
+    'site' => [
+        'nav' => 'Website',
+        'title' => 'Manage Clinic Website',
+        'sections' => [
+            'hero' => 'Hero',
+            'about' => 'About',
+            'services' => 'Services',
+            'features' => 'Highlights',
+            'faq' => 'FAQ',
+            'contact' => 'Contact',
+            'seo' => 'SEO',
+        ],
+        'hero' => [
+            'title' => 'Title',
+            'subtitle' => 'Subtitle',
+            'cta_text' => 'Button text',
+            'cta_url' => 'Button URL',
+        ],
+        'about' => [
+            'text' => 'About text',
+        ],
+        'services' => [
+            'title' => 'Service title',
+            'description' => 'Description',
+            'add' => 'Add service',
+        ],
+        'features' => [
+            'title' => 'Highlight title',
+            'description' => 'Description',
+            'add' => 'Add highlight',
+        ],
+        'faq' => [
+            'question' => 'Question',
+            'answer' => 'Answer',
+            'add' => 'Add FAQ',
+        ],
+        'contact' => [
+            'email' => 'Email',
+            'phone' => 'Phone',
+            'whatsapp' => 'WhatsApp',
+            'address' => 'Address',
+        ],
+        'seo' => [
+            'title' => 'SEO title',
+            'description' => 'SEO description',
+            'og_image' => 'Open Graph image (URL)',
+        ],
+        'save_draft' => 'Save Draft',
+        'publish' => 'Publish',
+        'preview' => 'Preview',
+        'revisions' => 'Revision History',
+        'revision' => [
+            'locale' => 'Language',
+            'status' => 'Status',
+            'date' => 'Date',
+        ],
+        'restore' => 'Restore',
+        'draft_saved' => 'Draft saved successfully.',
+        'published' => 'Content published successfully.',
+        'restored' => 'Revision restored as draft.',
+        'no_draft' => 'No draft to publish for this language.',
+        'revision_not_found' => 'Revision not found.',
+        'media' => [
+            'title' => 'Media',
+            'choose' => 'Choose an image',
+            'alt_text' => 'Alt text',
+            'hint' => 'JPG, PNG, WEBP, GIF, or SVG. Max :size KB.',
+            'submit' => 'Upload',
+            'empty' => 'No media yet.',
+            'delete' => 'Delete',
+            'delete_prompt' => 'Delete this media?',
+            'uploaded' => 'Media uploaded.',
+            'deleted' => 'Media deleted.',
+            'invalid' => 'The media file is invalid.',
+        ],
+    ],
+];
